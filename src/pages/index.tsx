@@ -1,9 +1,73 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
+import { Inter } from 'next/font/google';
+import styles from '@/styles/Home.module.css';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
+
+import React from 'react';
+
+const initialData = [
+  [-1, 5, -1, 9, -1, -1, -1, -1, -1],
+  [-1, -1, -1, -1, 6, -1, -1, -1, 8],
+  [-1, -1, -1, -1, -1, -1, 4, -1, -1],
+  [-1, -1, -1, -1, -1, -1, -1, 3, -1],
+  [-1, -1, -1, -1, -1, -1, -1, -1, 7],
+  [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+  [-1, 4, -1, -1, -1, -1, 8, -1, -1],
+  [-1, -1, 1, -1, -1, -1, -1, -1, -1],
+  [-1, -1, -1, 7, -1, -1, -1, -1, -1],
+];
+
+function SudokuTable() {
+  const [sudokuArr, setSudokuArr] = React.useState(initialData);
+
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, row: number, col: number) => {
+    const value = Number(e.target.value);
+
+    const newSudokuArr = [...sudokuArr];
+    newSudokuArr[row][col] = value < 9 && value > 0 ? value : -1;
+    setSudokuArr(newSudokuArr);
+  };
+
+  return (
+    <table className={`${styles.sudokuTable}`}>
+      <tbody>
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((row, rowIndex) => {
+          return (
+            <tr key={rowIndex} className={`${rowIndex % 3 === 2 ? styles.bottomBoarder : ''}`}>
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((col, colIndex) => (
+                <td
+                  key={colIndex + rowIndex}
+                  className={`${styles.cell} ${colIndex % 3 === 2 ? styles.rightBoarder : ''}`}
+                >
+                  <input
+                    className={`${styles.cellInput}`}
+                    type="number"
+                    value={
+                      sudokuArr[rowIndex][colIndex] === -1 ? '' : sudokuArr[rowIndex][colIndex]
+                    }
+                    onChange={(e) => onInputChange(e, row, col)}
+                    disabled={initialData[rowIndex][colIndex] !== -1}
+                  ></input>
+                </td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+function ButtonGroup() {
+  return (
+    <div style={{ marginTop: '40px' }}>
+      <button className={`${styles.checkButton}`}>Check</button>
+      <button className={`${styles.solveButton}`}>Solve</button>
+      <button className={`${styles.resetButton}`}>Reset</button>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -15,100 +79,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        <h1 style={{ marginBottom: '40px' }}>SUDOKU</h1>
+        <SudokuTable></SudokuTable>
+        <ButtonGroup></ButtonGroup>
       </main>
     </>
-  )
+  );
 }
