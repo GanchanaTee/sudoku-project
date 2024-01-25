@@ -1,30 +1,60 @@
 import Head from 'next/head';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
+import React, { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
-import React from 'react';
-
-const initialData = [
-  [-1, 5, -1, 9, -1, -1, -1, -1, -1],
-  [-1, -1, -1, -1, 6, -1, -1, -1, 8],
-  [-1, -1, -1, -1, -1, -1, 4, -1, -1],
-  [-1, -1, -1, -1, -1, -1, -1, 3, -1],
-  [-1, -1, -1, -1, -1, -1, -1, -1, 7],
-  [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-  [-1, 4, -1, -1, -1, -1, 8, -1, -1],
-  [-1, -1, 1, -1, -1, -1, -1, -1, -1],
-  [-1, -1, -1, 7, -1, -1, -1, -1, -1],
-];
-
 function SudokuTable() {
-  const [sudokuArr, setSudokuArr] = React.useState(initialData);
+  const [initialData, setInitialData] = React.useState([
+    [-1, 5, -1, 9, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, 6, -1, -1, -1, 8],
+    [-1, -1, -1, -1, -1, -1, 4, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, 3, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, 7],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, 4, -1, -1, -1, -1, 8, -1, -1],
+    [-1, -1, 1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, 7, -1, -1, -1, -1, -1],
+  ]);
+
+  const [sudokuArr, setSudokuArr] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedData = localStorage.getItem('sudokuArr');
+      return savedData ? JSON.parse(savedData) : initialData;
+    }
+    return initialData;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sudokuArr', JSON.stringify(sudokuArr));
+    }
+  }, [sudokuArr]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedInitialData = localStorage.getItem('initialData');
+      if (!savedInitialData) {
+        fetch('https://sudoku-project-git-main-ganchanatee.vercel.app/api/hello')
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error('There has been a problem with your fetch operation:', error);
+          });
+        localStorage.setItem('initialData', JSON.stringify(initialData));
+        return;
+      }
+      setInitialData(savedInitialData ? JSON.parse(savedInitialData) : initialData);
+    }
+  }, []);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>, row: number, col: number) => {
     const value = Number(e.target.value);
 
-    const newSudokuArr = [...sudokuArr];
+    const newSudokuArr = sudokuArr.map((arr: number[]) => [...arr]);
     newSudokuArr[row][col] = value < 9 && value > 0 ? value : -1;
     setSudokuArr(newSudokuArr);
   };
