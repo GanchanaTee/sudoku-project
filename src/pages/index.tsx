@@ -36,7 +36,8 @@ function SudokuTable() {
     if (typeof window !== 'undefined') {
       const savedInitialData = localStorage.getItem('initialData');
       if (!savedInitialData) {
-        fetch('https://sudoku-project-git-main-ganchanatee.vercel.app/api/hello')
+        const apiURL = process.env.NEXT_PUBLIC_API_URL;
+        fetch(`${apiURL}/hello`)
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
