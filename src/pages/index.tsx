@@ -5,22 +5,24 @@ import React, { useEffect } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// TODO: restructure the code
 function SudokuTable() {
   const [initialData, setInitialData] = React.useState([
-    [-1, 5, -1, 9, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, 6, -1, -1, -1, 8],
-    [-1, -1, -1, -1, -1, -1, 4, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, 3, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, 7],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, 4, -1, -1, -1, -1, 8, -1, -1],
-    [-1, -1, 1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, 7, -1, -1, -1, -1, -1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
 
   const [sudokuArr, setSudokuArr] = React.useState(() => {
     if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('sudokuArr');
+
       return savedData ? JSON.parse(savedData) : initialData;
     }
     return initialData;
@@ -37,18 +39,20 @@ function SudokuTable() {
       const savedInitialData = localStorage.getItem('initialData');
       if (!savedInitialData) {
         const apiURL = process.env.NEXT_PUBLIC_API_URL;
-        fetch(`${apiURL}/hello`)
+        fetch(`${apiURL}/sudoku/generate`)
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
+            setInitialData(data.startedBoard);
+            localStorage.setItem('initialData', JSON.stringify(data.startedBoard));
+            setSudokuArr(data.startedBoard);
+            localStorage.setItem('sudokuArr', JSON.stringify(data.startedBoard));
           })
           .catch((error) => {
             console.error('There has been a problem with your fetch operation:', error);
           });
-        localStorage.setItem('initialData', JSON.stringify(initialData));
         return;
       }
-      setInitialData(savedInitialData ? JSON.parse(savedInitialData) : initialData);
+      setInitialData(JSON.parse(savedInitialData));
     }
   }, []);
 
@@ -56,47 +60,92 @@ function SudokuTable() {
     const value = Number(e.target.value);
 
     const newSudokuArr = sudokuArr.map((arr: number[]) => [...arr]);
-    newSudokuArr[row][col] = value < 9 && value > 0 ? value : -1;
+    newSudokuArr[row][col] = value <= 9 && value > 0 ? value : 0;
     setSudokuArr(newSudokuArr);
   };
 
-  return (
-    <table className={`${styles.sudokuTable}`}>
-      <tbody>
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((row, rowIndex) => {
-          return (
-            <tr key={rowIndex} className={`${rowIndex % 3 === 2 ? styles.bottomBoarder : ''}`}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((col, colIndex) => (
-                <td
-                  key={colIndex + rowIndex}
-                  className={`${styles.cell} ${colIndex % 3 === 2 ? styles.rightBoarder : ''}`}
-                >
-                  <input
-                    className={`${styles.cellInput}`}
-                    type="number"
-                    value={
-                      sudokuArr[rowIndex][colIndex] === -1 ? '' : sudokuArr[rowIndex][colIndex]
-                    }
-                    onChange={(e) => onInputChange(e, row, col)}
-                    disabled={initialData[rowIndex][colIndex] !== -1}
-                  ></input>
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-}
+  const checkResult = () => {
+    const apiURL = process.env.NEXT_PUBLIC_API_URL;
+    const sudokuArr = localStorage.getItem('sudokuArr');
+    fetch(`${apiURL}/sudoku/solve`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sudokuBoard: JSON.parse(sudokuArr ? sudokuArr : '') }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.isCorrect) {
+          alert('Correct!');
+        } else {
+          alert('Incorrect!');
+        }
+      })
+      .catch((error) => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  };
 
-function ButtonGroup() {
+  const recreateBoard = () => {
+    const apiURL = process.env.NEXT_PUBLIC_API_URL;
+    fetch(`${apiURL}/sudoku/generate`)
+      .then((response) => response.json())
+      .then((data) => {
+        localStorage.setItem('initialData', JSON.stringify(data.startedBoard));
+        localStorage.setItem('sudokuArr', JSON.stringify(data.startedBoard));
+        setInitialData(data.startedBoard);
+        setSudokuArr(data.startedBoard);
+      })
+      .catch((error) => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  };
+
+  const reset = () => {
+    setSudokuArr(initialData);
+  };
+
   return (
-    <div style={{ marginTop: '40px' }}>
-      <button className={`${styles.checkButton}`}>Check</button>
-      <button className={`${styles.solveButton}`}>Solve</button>
-      <button className={`${styles.resetButton}`}>Reset</button>
-    </div>
+    <>
+      <table className={`${styles.sudokuTable}`}>
+        <tbody>
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((row, rowIndex) => {
+            return (
+              <tr key={rowIndex} className={`${rowIndex % 3 === 2 ? styles.bottomBoarder : ''}`}>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((col, colIndex) => (
+                  <td
+                    key={colIndex + rowIndex}
+                    className={`${styles.cell} ${colIndex % 3 === 2 ? styles.rightBoarder : ''}`}
+                  >
+                    <input
+                      className={`${styles.cellInput}`}
+                      type="number"
+                      value={
+                        sudokuArr[rowIndex][colIndex] === 0 ? '' : sudokuArr[rowIndex][colIndex]
+                      }
+                      onChange={(e) => onInputChange(e, row, col)}
+                      disabled={initialData[rowIndex][colIndex] !== 0}
+                    ></input>
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div style={{ marginTop: '40px' }}>
+        <button onClick={checkResult} className={`${styles.checkButton}`}>
+          Check
+        </button>
+        <button onClick={reset} className={`${styles.resetButton}`}>
+          Reset
+        </button>
+        <button onClick={recreateBoard} className={`${styles.restartButton}`}>
+          Restart
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -111,8 +160,7 @@ export default function Home() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <h1 style={{ marginBottom: '40px' }}>SUDOKU</h1>
-        <SudokuTable></SudokuTable>
-        <ButtonGroup></ButtonGroup>
+        <SudokuTable />
       </main>
     </>
   );
