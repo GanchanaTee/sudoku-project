@@ -27,11 +27,11 @@
 }
 
 .bottomBoarder {
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid whitesmoke;
 }
 
 .rightBoarder {
-  border-right: 2px solid black;
+  border-right: 2px solid whitesmoke;
 }
 
 .checkButton {
@@ -42,7 +42,7 @@
   font-size:  1rem;
   margin-right: 2rem;
 }
-.solveButton {
+.resetButton {
   background-color: sandybrown;
   font-weight: bold ;
   padding: 12px 20px;
@@ -50,7 +50,7 @@
   font-size:  1rem;
   margin-right: 2rem;
 }
-.resetButton {
+.restartButton {
   background-color: tomato;
   font-weight: bold ;
   padding: 12px 20px;
