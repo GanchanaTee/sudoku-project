@@ -67,6 +67,8 @@ const nextEmptyCell = (sudokuBoard: number[][]) => {
   return false;
 };
 
+// TODO: should do unit tests for this function to ensure it works as expected
+//       generate  a board from fillPuzzle and then check that it is valid from the solver
 const fillValuesInSudokuBoard = (
   sudokuBoard: number[][],
   counter: number = 0

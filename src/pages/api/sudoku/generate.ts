@@ -10,6 +10,7 @@ export default function handler(
   const numberOfHoles = Number(process.env.NEXT_PUBLIC_GENERATE_SUDOKU_HOLES) || 20;
   const startedBoard = createStartedBoard(numberOfHoles);
 
+  // TODO: should handle when error occurs
   res.status(200).json({
     startedBoard: startedBoard || [],
   });
