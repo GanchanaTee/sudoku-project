@@ -1,0 +1,28 @@
+.sudokuTable {
+  border-collapse: collapse;
+  border: 3px solid whitesmoke;
+}
+
+.bottomBoarder {
+  border-bottom: 2px solid whitesmoke;
+}
+
+.rightBoarder {
+  border-right: 2px solid whitesmoke;
+}
+
+.cellInput {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #000;
+  font-size: 20px;
+  text-align: center;
+  padding: 0;
+}
+
+.cellInput::-webkit-inner-spin-button,
+.cellInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
