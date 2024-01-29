@@ -36,6 +36,7 @@ const checkBoxCorrect = (sudokuBoard: number[][], rowBoxIndex: number, colBoxInd
   return true;
 };
 
+// TODO: should add unit tests
 export const sudokuSolver = (sudokuBoard: number[][]) => {
   if (!isValidSudokuBoard(sudokuBoard)) {
     return false;
